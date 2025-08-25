@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>رحلة سينمائية عبر الفضاء</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap');
+
+body, html { margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:black; font-family:'Caveat', cursive; }
+
+#page1 {
+  display:flex; justify-content:center; align-items:center; height:100vh;
+  color:#00ffff; font-size:3em; cursor:pointer; transition: opacity 1s ease;
+}
+
+#page2 {
+  display:none; width:100%; height:100%; position:relative;
+  overflow:hidden;
+}
+
+.star {
+  position:absolute; width:2px; height:2px; background:white; border-radius:50%;
+  opacity:0.8; animation:twinkle 3s infinite alternate;
+}
+
+@keyframes twinkle {
+  0% { opacity:0.2; transform:scale(0.5);}
+  50% { opacity:1; transform:scale(1.5);}
+  100% { opacity:0.2; transform:scale(0.5);}
+}
+
+/* الكواكب */
+.planet {
+  position:absolute; border-radius:50%; background:linear-gradient(45deg,#f0f,#08f);
+  width:30px; height:30px; animation:orbit linear infinite;
+}
+
+/* نيازك وشهب */
+.meteor {
+  position:absolute; width:2px; height:2px; background:orange; border-radius:50%;
+  animation:fall linear infinite;
+}
+
+@keyframes fall {
+  0% { transform:translateY(-10vh) translateX(0) rotate(0deg);}
+  100% { transform:translateY(110vh) translateX(200px) rotate(720deg);}
+}
+
+/* ثقب أسود مع هالة */
+#blackhole {
+  position:absolute; top:50%; left:50%;
+  width:150px; height:150px;
+  background: radial-gradient(circle, #000 40%, #222 60%, #ff4500 70%, #ffae00 80%, #0000 100%);
+  border-radius:50%;
+  transform:translate(-50%, -50%) rotate(0deg);
+  cursor:pointer;
+  box-shadow:0 0 50px 10px rgba(255,140,0,0.3);
+  z-index:2;
+  animation:rotateBH 10s linear infinite;
+}
+
+@keyframes rotateBH {
+  0% { transform:translate(-50%, -50%) rotate(0deg);}
+  100% { transform:translate(-50%, -50%) rotate(360deg);}
+}
+
+/* الباب */
+#door {
+  position:absolute; top:50%; left:50%;
+  width:200px; height:300px; background:#222; border:5px solid #0ff;
+  transform:translate(-50%, -50%) scale(0); border-radius:10px;
+  cursor:pointer; transition: transform 1.5s ease, box-shadow 1s ease;
+  display:flex; justify-content:center; align-items:center; color:#0ff;
+  font-size:2em; font-family:'Caveat', cursive; text-align:center;
+  box-shadow:0 0 0 #0ff;
+  z-index:3;
+}
+
+/* كتابة باليد */
+.handwriting {
+  position:absolute; top:10%; width:100%; text-align:center;
+  font-size:2.5em; color:#00ffff; text-shadow:0 0 10px #0ff,0 0 20px #0ff;
+  font-family:'Caveat', cursive; transition:opacity 2s ease;
+  z-index:3;
+}
+</style>
+</head>
+<body>
+
+<audio id="spaceSound" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" autoplay loop></audio>
+
+<div id="page1">اضغط هنا لتبدأ رحلتك 🌌</div>
+
+<div id="page2">
+  <div class="handwriting">🌌 مرحبًا بك في عالم الفضاء 🌌</div>
+  <div id="blackhole"></div>
+  <div id="door">اضغط هنا</div>
+</div>
+
+<script>
+const page1 = document.getElementById('page1');
+const page2 = document.getElementById('page2');
+const blackhole = document.getElementById('blackhole');
+const handwriting = document.querySelector('.handwriting');
+const door = document.getElementById('door');
+const spaceSound = document.getElementById('spaceSound');
+
+// الانتقال للصفحة الثانية
+page1.addEventListener('click', () => {
+  page1.style.opacity='0';
+  setTimeout(()=>{ page1.style.display='none'; page2.style.display='block'; },1000);
+});
+
+// إنشاء النجوم
+let stars = [];
+for(let i=0;i<200;i++){
+  let s=document.createElement('div');
+  s.className='star';
+  s.style.top=Math.random()*100+'vh';
+  s.style.left=Math.random()*100+'vw';
+  s.style.width=(Math.random()*2+1)+'px';
+  s.style.height=s.style.width;
+  page2.appendChild(s);
+  stars.push(s);
+}
+
+// إنشاء كواكب
+for(let i=0;i<5;i++){
+  let p=document.createElement('div');
+  p.className='planet';
+  p.style.width=(20+Math.random()*30)+'px';
+  p.style.height=p.style.width;
+  p.style.top=(10+Math.random()*80)+'vh';
+  p.style.left=(10+Math.random()*80)+'vw';
+  p.style.animationDuration=(10+Math.random()*20)+'s';
+  page2.appendChild(p);
+}
+
+// إنشاء نيازك وشهب
+for(let i=0;i<30;i++){
+  let m=document.createElement('div');
+  m.className='meteor';
+  m.style.top=Math.random()*-100+'vh';
+  m.style.left=Math.random()*100+'vw';
+  m.style.animationDuration=(2+Math.random()*3)+'s';
+  page2.appendChild(m);
+}
+
+// الدخول في الثقب الأسود
+blackhole.addEventListener('click',()=>{
+  handwriting.style.opacity='0';
+  let centerX=window.innerWidth/2;
+  let centerY=window.innerHeight/2;
+
+  // تشويه النجوم نحو الثقب الأسود
+  stars.forEach(s=>{
+    let rect=s.getBoundingClientRect();
+    let dx=rect.left-centerX;
+    let dy=rect.top-centerY;
+    let angle=Math.atan2(dy,dx);
+    let distance=Math.sqrt(dx*dx+dy*dy);
+    let newDistance=distance*0.2;
+    s.style.transition='all 3s ease';
+    s.style.left=centerX+newDistance*Math.cos(angle)+'px';
+    s.style.top=centerY+newDistance*Math.sin(angle)+'px';
+  });
+
+  // ظهور الباب بشكل واضح بعد 3 ثواني
+  setTimeout(()=>{
+    door.style.transform='translate(-50%,-50%) scale(1)';
+    door.style.boxShadow='0 0 40px 10px #0ff';
+    setInterval(()=>{
+      door.style.boxShadow='0 0 60px 20px #0ff';
+      setTimeout(()=>{door.style.boxShadow='0 0 40px 10px #0ff';},500);
+    },1000);
+  },3000);
+});
+
+// عند الضغط على الباب
+door.addEventListener('click',()=>{
+  door.innerText='طبسي حوت راك فاهم';
+  door.style.background='#000';
+});
+</script>
+</body>
+</html>
